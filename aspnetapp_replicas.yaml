@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ns-aspnetapp
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aspnetapp
+  namespace: ns-aspnetapp
+spec:
+  selector:
+    app: aspnetapp
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aspnetapp
+  namespace: ns-aspnetapp
+spec:
+  replicas: 6
+  selector:
+    matchLabels:
+      app: aspnetapp
+  template:
+    metadata:
+      labels:
+        app: aspnetapp
+    spec:
+     containers:
+      - name: aspnetapp-image
+        image: "mcr.microsoft.com/dotnet/core/samples:aspnetapp"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 250m
+            memory: 256Mi
+        ports:
+        - containerPort: 80
